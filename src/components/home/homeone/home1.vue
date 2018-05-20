@@ -14,7 +14,7 @@
 		                      </div>
 		                  	</div>
 		                  	<div class="recommend-img">
-		                      <img v-lazy="item.image">
+		                      <img v-bind:src="item.image">
 		                  	</div>
               			</div>
 					</div>
@@ -36,7 +36,6 @@
 </template>
 
 <script>
-var axios = require('axios')
   import Scroll from 'base/scroll/scroll.vue'
   import {ERR_OK} from 'api/config.js'
   import newslist from 'base/newslist/newslist.vue'
@@ -58,23 +57,22 @@ var axios = require('axios')
     props: {
 
     },
-    created() {
-    		
-      this.$http.get('./api/find').then((response) => {
-          response = response.body;
-          if (response.errno === ERR_OK) {
-            this.find = response.data;
-          }
-      });
-      this.$http.get('./api/home').then((response) => {
-          response = response.body;
-          if (response.errno === ERR_OK) {
-            this.home = response.data;
-          }
-      });
-
+    mounted(){
+    this.fetchData();
     },
-    methods: {
+    methods:{
+
+      fetchData(){
+       let _this=this;
+        this.$http.get('static/data.json')
+        .then(function(res){
+
+         _this.home=res.data.home;
+        })
+        .catch(function(err){
+          console.log('hello world' ,err);
+        })
+      },
       selectlist(item) {
         this.selectedlist = item;
         this.$refs.listdetail.show();
@@ -91,7 +89,6 @@ var axios = require('axios')
 <style>
   .homepage {
     height: auto;
-    margin-top: 50px;
     overflow: hidden;
   }
   .homepage-roll-container {

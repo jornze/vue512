@@ -91,7 +91,7 @@
 			data(){
 				setTimeout(()=>{
 				this.refresh()
-				},this,refreshDelay)
+				},this.refreshDelay)
 			}
 		}
 	}
