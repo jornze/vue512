@@ -83,4 +83,4 @@ body, html{
   color: #8b8b8b;
   font-size: 16px;
 }
-  
+::-webkit-scrollbar {display:none}

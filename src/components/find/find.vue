@@ -1,4 +1,5 @@
 <template>
+<div>
 	<div class='find'>
 		<div class='find-head' @click='selectSearch()'>
 			<div class="search-container">
@@ -9,18 +10,114 @@
 		</div>
 		<search ref="search"></search>
 	</div>
-
+    <scroll class='find-roll-container' :data='newslist'>
+        <div class='content-wrapper' ref='contentWrapper'>
+            <div  class='recommend'>
+                <div class='recommend-content'>
+                    <div v-if='recommends.length' class='slider-wrapper'>
+                        <slider>
+                            <div v-for='item in recommends'>
+                                <a :href='item.linkUrl'>
+                                    <img :src='item.picUrl'>
+                                </a>
+                            </div>
+                        </slider>
+                    </div>
+                </div>
+            </div>
+            <div class='hot'></div>
+            <div class='boil'>
+                <div class='boil_tit' @click='showBoil'>
+                     <i class="boil_tit_img"></i>
+                    沸点
+                    <div class="right_img"><i class="iconfont">&gt;</i></div>
+                </div>
+                <div class="boil_img">
+                    <div class="find-boil-container" ref="boilWrapper">
+                    <ul id="wp">
+                        <li @click="selectboildetail(item)" class="boil_img_1" v-for="item in boilddetails"><img :src="item.image"><span><p>{{item.title}}</p></span></li>
+                        <span class="view_all" @click='showBoil'>查看全部</span>
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </scroll>
+    <boil ref='boil'></boil>
+    <boildetail ref='boildetail' :boilD='slboildetail'></boildetail>
+</div>
 </template>
 <script>	
 import search from "base/search/search.vue"
+import scroll from "base/scroll/scroll"
+import slider from "base/slider/slider"
+import BScroll from "better-scroll"
+import boil from "base/boil/boil.vue"
+import boildetail from "base/boildetail/boildetail.vue"
 	export default{
+        data(){
+            return{
+                recommends:{
+                    type:Object
+                },
+                boilddetails:{
+                    type:Object
+                },
+                newslist:{
+                    type:Object
+                },
+                slboildetail:{}
+            }
+        },
 		components:{
-			search
+			search,
+            scroll,
+            slider,
+            boil,
+            boildetail
 		},
+        mounted(){
+            this.fetchSlider();
+            this.boilddetail();
+            this._initScroll();
+        },
 		methods:{
 			selectSearch(){
 				 this.$refs.search.show();
-			}
+			},
+            showBoil(){
+                 this.$refs.boil.show();
+            },
+            fetchSlider(){
+                var _this=this;
+                this.$http.get('/api/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg').then(function(res){
+                    _this.recommends=res.data.data.slider;
+                }).catch(function(err){
+
+                    console.log('sliderDate',err)
+                })
+            },
+            boilddetail(){
+                var _this=this;
+                this.$http.get('static/data.json').then(function(res){
+                    _this.boilddetails=res.data.find.boilddetail
+                }).catch(function(err){
+                    console.log('boilddetail',err);
+                })
+            },
+            selectboildetail(item){
+                this.slboildetail=item;
+                this.$refs.boildetail.show();
+            },
+            _initScroll() {
+                this.foodsScroll = new BScroll(this.$refs.boilWrapper, {
+                    click: true,
+                    scrollX: true,
+                    probeType: 3
+                });
+            }
+
 		}
 	}
 </script>
@@ -60,5 +157,263 @@ import search from "base/search/search.vue"
     line-height: 30px;
     background-color: #E0E1E5;
     border-radius: 5px;
+}
+.search_img {
+    font-size: 20px;
+}
+.recommend {
+    width: 100%;
+    top: 40px;
+    bottom: 0;
+}
+.recommend .recommend-content {
+    height: 100%;
+    overflow: hidden;
+}
+.recommend .recommend-content .slider-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+.hot {
+    display: flex;
+    width: 100%;
+    height: 90px;
+    line-height: 100px;
+    margin-top: 10px;
+    background: #fff;
+    color: #2E3135;
+}
+.hot .hot_item {
+    flex: 1;
+    text-align: center;
+}
+.hot_ic {
+    display: block;
+    height: 50px;
+    padding-top: 13px;
+}
+.hot .hot_item span {
+    display: block;
+    height: 25px;
+    line-height: 20px;
+}
+.week {
+    background: url('./image/hot_1.png') center center no-repeat;
+    background-size: 35%;
+}
+.collect {
+    background: url('./image/hot_2.png') center center no-repeat;
+    background-size: 35%;
+}
+.activity {
+    background: url('./image/hot_3.png') center center no-repeat;
+    background-size: 40%;
+}
+.zhuanlan {
+    background: url('./image/hot_4.png') center center no-repeat;
+    background-size: 30%;
+}
+.boil {
+    height: 160px;
+    width: 100%;
+    margin-top: 10px;
+    background-color: #fff;
+}
+.boil .boil_tit {
+    height: 45px;
+    line-height: 45px;
+    color: #000;
+    font-size: 15px;
+    box-shadow: inset 0px -1px 1px -1px #A7A7AB;
+}
+.boil_tit_img {
+    display: block;
+    float: left;
+    width: 24px;
+    height: 100%;
+    margin-left: 12px;
+    margin-right: 5px;
+    background: url('./image/boil_point.png') left center no-repeat;
+    background-size: 70%;
+}
+.right_img {
+    float: right;
+    width: 18px;
+    height: 100%;
+    margin-right: 10px;
+}
+.boil .boil_img {
+    width: auto;
+    height: 120px;
+    overflow-x: auto !important;
+}
+::-webkit-scrollbar {
+    display: none;
+}
+.find-boil-container {
+
+}
+.boil .boil_img ul {
+    height: 120px;
+    width: 1055px;
+    padding-left: 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.boil .boil_img ul li {
+    position: relative;
+    display: inline-block;
+    /* float: left; */
+    height: 90px;
+    width: 180px;
+    border-radius: 5px;
+    margin: 10px;
+    margin-left: 0;
+}
+.boil .boil_img ul li span {
+    position: absolute;
+    display: block;
+    width: 180px;
+    height: 90px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 15px;
+    box-shadow: inset 180px 10px 5px rgba(0,0,0,.4);
+}
+.boil .boil_img ul li span p {
+    width: 145px;
+    height: 35px;
+    padding-left: 20px;
+    padding-right: 15px;
+    padding-top: 25px;
+    font-size: 15px;
+    line-height: 18px;
+    overflow: hidden;
+    white-space: normal;
+    text-overflow: ellipsis !important;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+.boil_img_1 {
+    /* background-image: url(./image/boil_item_1.png); */
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: cover;
+}
+.boil_img_1 img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 90px;
+    width: 180px;
+    border-radius: 5px;
+}
+/* .boil_img_2 {
+    background-image: url(./image/boil_item_2.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
+.boil_img_3 {
+    background-image: url(./image/boil_item_3.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.boil_img_4 {
+    background-image: url(./image/boil_item_4.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.boil_img_5 {
+    background-image: url(./image/boil_item_5.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+} */
+.view_all {
+    position: absolute;
+    display: inline-block;
+    height: 90px;
+    line-height: 130px;
+    text-align: center;
+    width: 90px;
+    margin-top: 10px;
+    color: #53AAFF;
+    font-size: 15px;
+    border: 0.5px solid #ccc;
+    border-radius: 5px;
+    background: url(./image/right3.png) center 12px no-repeat;
+    background-size: 40%;
+}
+.content {
+    background-color: #FFF;
+    margin-top: 10px;
+}
+.content .content_head {
+    height: 45px;
+    line-height: 45px;
+    font-size: 15px;
+    box-shadow: inset 0px -1px 1px -1px #A7A7AB;
+}
+.content .content_head .head_left {
+    float: left;
+    width: 30%;
+    color: #000;
+    padding-left: 40px;
+    background: url(./image/hot_red.png) 12px center no-repeat;
+    background-size: 11%;
+}
+.content .content_head .head_right {
+    float: right;
+    width: 30%;
+    text-align: right;
+    padding-right: 12px;
+}
+.content .content_head .head_right i{
+    margin-right: 5px;
+}
+
+.content_list ul{
+    display: block;
+}
+.content_list .cont_list_item {
+    position: relative;
+    display: block;
+    height: 80px;
+    padding-top: 20px;
+    box-shadow: inset 0px -1px 1px -1px #A7A7AB;
+}
+.content_list .cont_list_item .list_item_container {
+    padding-left: 12px;
+}
+.list_item_container p {
+    width: 70%;
+    color: #000;
+    font-size: 16px;
+    line-height: 18px;
+    padding-top: 2px;
+    padding-bottom: 10px;
+}
+.list_item_container span {
+    font-size: 14px;
+}
+
+.content_list .cont_list_item  img {
+    position: absolute;
+    height: 60px;
+    width: 60px;
+    top: 50%;
+    margin-top: -30px;
+    right: 12px;
+}
+img[src=""] {
+    opacity: 0;
+}
+.loading-container {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
 }
 </style>

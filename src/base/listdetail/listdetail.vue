@@ -2,7 +2,7 @@
   <transition name="move">
     <div v-show="showFlag" class="listdetail">
       <div class="detail-head">
-        <div class="Btn-back" @click="hide"><i class="iconfont">&#xe607;</i></div>
+        <div class="Btn-back" @click="hide"><i class="iconfont">&lt;</i></div>
         <div class="author-infor">
           <div class="author-img"><img :src="list.author_img" ></div>
           <span>{{list.author}}</span>

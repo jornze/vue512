@@ -4,10 +4,11 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import './common/css/reset.css'
-
+import jsonp from 'jsonp'
 import axios from 'axios'
-Vue.prototype.$http=axios
+Vue.prototype.$http=axios;
 
+Vue.prototype.$jsonp=jsonp
 axios.defaults.baseURL = 'http://localhost:8081';
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 Vue.config.productionTip = false
