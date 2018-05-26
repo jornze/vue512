@@ -19,10 +19,10 @@
 		        type: Boolean,
 		        default: false
 		      },
-		      data: {
+		      /*data: {
 		        type: Object,
 		        default: null
-		      },
+		      },*/
 		      pullup: {
 		        type: Boolean,
 		        default: false

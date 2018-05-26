@@ -25,7 +25,24 @@
                     </div>
                 </div>
             </div>
-            <div class='hot'></div>
+           <div class="hot">
+                <div class="hot_item">
+                    <i class="hot_ic week"></i>
+                    <span>本周最热</span>
+                </div>
+                <div class="hot_item">
+                    <i class="hot_ic collect"></i>
+                    <span>收藏集</span>
+                </div>
+                <div class="hot_item">
+                    <i class="hot_ic activity"></i>
+                    <span>线下活动</span>
+                </div>
+                <div class="hot_item">
+                    <i class="hot_ic zhuanlan"></i>
+                    <span>专栏</span>
+                </div>
+            </div>
             <div class='boil'>
                 <div class='boil_tit' @click='showBoil'>
                      <i class="boil_tit_img"></i>
@@ -41,11 +58,34 @@
                     </div>
                 </div>
             </div>
+            <div class="content">
+                <div class="content_head">
+                    <div class="head_left">热门文章</div>
+                    <div class="head_right"><i class="iconfont">&#xe77e;</i>定制热门</div>
+                </div>
+                                <div class="content_list">
+                    <div class="loading-container" v-show="!newslist.length">
+                        <loading></loading>
+                    </div>
+
+                    <ul>
+                        <li @click="hotdetail(item)" class="cont_list_item" v-for="item in newslist">
+                            <div class="list_item_container">
+                                <p>{{item.title}}</p>
+                                <span>{{item.like}}人喜欢·{{item.author}}·{{item.time}}前</span>
+                                <img :src="item.image">
+                            </div>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
         </div>
        
     </scroll>
     <boil ref='boil'></boil>
-    <boildetail ref='boildetail' :boilD='slboildetail'></boildetail>
+    <boildetail ref='boildetail' :boildetails='slboildetail'></boildetail>
+    <listdetail :list='hotdata' ref='hotde'></listdetail>
 </div>
 </template>
 <script>	
@@ -55,10 +95,15 @@ import slider from "base/slider/slider"
 import BScroll from "better-scroll"
 import boil from "base/boil/boil.vue"
 import boildetail from "base/boildetail/boildetail.vue"
+import listdetail from "base/listdetail/listdetail.vue"
+import loading from "base/loading/loading"
 	export default{
         data(){
             return{
                 recommends:{
+                    type:Object
+                },
+                finddata:{
                     type:Object
                 },
                 boilddetails:{
@@ -67,7 +112,10 @@ import boildetail from "base/boildetail/boildetail.vue"
                 newslist:{
                     type:Object
                 },
-                slboildetail:{}
+                slboildetail:{},
+                hotdata:{
+                    type:Object
+                }
             }
         },
 		components:{
@@ -75,7 +123,9 @@ import boildetail from "base/boildetail/boildetail.vue"
             scroll,
             slider,
             boil,
-            boildetail
+            boildetail,
+            listdetail,
+            loading
 		},
         mounted(){
             this.fetchSlider();
@@ -101,7 +151,9 @@ import boildetail from "base/boildetail/boildetail.vue"
             boilddetail(){
                 var _this=this;
                 this.$http.get('static/data.json').then(function(res){
-                    _this.boilddetails=res.data.find.boilddetail
+                   _this.finddata=res.data.find;
+                   _this.boilddetails=_this.finddata.boilddetail;
+                    _this.newslist=_this.finddata.content;
                 }).catch(function(err){
                     console.log('boilddetail',err);
                 })
@@ -109,6 +161,10 @@ import boildetail from "base/boildetail/boildetail.vue"
             selectboildetail(item){
                 this.slboildetail=item;
                 this.$refs.boildetail.show();
+            },
+            hotdetail(item){
+                this.hotdata=item;
+                this.$refs.hotde.show();
             },
             _initScroll() {
                 this.foodsScroll = new BScroll(this.$refs.boilWrapper, {
